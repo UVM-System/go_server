@@ -1,15 +1,16 @@
 /**
 与树莓派和目标检测服务器连接的中间服务器
-1. 处理来自树莓派的照片数据，根据传来的 token 信息选择性发送给远程服务器进行检测
+1. 处理来自树莓派的照片数据
 2. 处理来自远程服务器的检测数据（json格式），根据传来的信息，判断客户买了什么商品
 3. 向用户设备发送购物车数据（具体功能待定）
 */
 package main
 
 import (
-	"github.com/gin-gonic/gin"
 	"go_server/handler"
 	"sync"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Counter struct {
@@ -18,7 +19,7 @@ type Counter struct {
 }
 
 type Goods struct {
-	Name string
+	Name   string
 	Number int
 }
 
@@ -32,7 +33,6 @@ func main() {
 	router := gin.Default()
 	// 调用 POST 方法，传入路由参数和路由函数
 	router.POST("/photo", handler.ImageHandler)
-	router.GET("/token", handler.TokenHandler)
 	// 监听端口 8000
 	router.Run(":8000")
 

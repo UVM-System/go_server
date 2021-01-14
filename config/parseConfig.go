@@ -2,27 +2,27 @@
 package config
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
 	"sync"
+
+	"gopkg.in/yaml.v2"
 )
 
 var (
 	Config conf
-	once sync.Once
+	once   sync.Once
 )
 
 type Account struct {
 	MachineId string `yaml:"machineid"`
-	Password string `yaml:"password"`
+	Password  string `yaml:"password"`
 }
 
 type conf struct {
-	DetectUrl string `yaml:"detecturl"`
-	TokenLength int `yaml:"tokenlength"`
-	Accounts []Account `yaml:"accounts"`
-	Goods []string `yaml:"goods"`
+	DetectUrl string    `yaml:"detecturl"`
+	Accounts  []Account `yaml:"accounts"`
+	Goods     []string  `yaml:"goods"`
 }
 
 func (c *conf) getConf() {
@@ -36,11 +36,10 @@ func (c *conf) getConf() {
 	}
 }
 
-
-func init()  {
+func init() {
 	once.Do(readConfig)
 }
 
-func readConfig()  {
+func readConfig() {
 	Config.getConf()
 }
