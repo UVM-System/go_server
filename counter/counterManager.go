@@ -19,7 +19,7 @@ func init() {
 	Counters = make(map[string][]Goods)
 }
 
-// 接收检测的结果，如果是第一次检测，则存储信息，返回 nil；否则，更新冰箱商品数量，并返回商品数量的改变量
+// UpdateCounter 接收检测的结果，如果是第一次检测，则存储信息，返回 nil；否则，更新冰箱商品数量，并返回商品数量的改变量
 func UpdateCounter(machineid string, state string, goodsList []Goods) map[string]int {
 	// 开门初始化
 	if strings.EqualFold(state,"start") {
@@ -31,10 +31,9 @@ func UpdateCounter(machineid string, state string, goodsList []Goods) map[string
 		//// 更新 Counters
 		//Counters[machineid] = goodsList
 		return change
-	} else {
-		log.Println("receive illegal message")
-		return nil
 	}
+	log.Println("receive illegal message")
+	return nil
 }
 // 创建一个商品列表
 func createGoodsList(detectResult map[string]int) []Goods {

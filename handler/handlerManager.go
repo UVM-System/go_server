@@ -3,6 +3,7 @@ package handler
 
 import (
 	"fmt"
+	"go_server/counter"
 	"go_server/photo"
 	"log"
 	"net/http"
@@ -32,7 +33,7 @@ func ImageHandler(c *gin.Context) {
 		file, _ := fileHeader.Open()
 		n, err := file.Read(data)
 		if err != nil {
-			log.Println("got erro", err)
+			log.Println("got error", err)
 			log.Println("read byte number:", n)
 		}
 		// 创建图像结构
@@ -41,31 +42,31 @@ func ImageHandler(c *gin.Context) {
 		pic, _ := gocv.IMDecode(data, gocv.IMReadColor)
 		gocv.IMWrite("./pictures/original/"+fileHeader.Filename, pic)
 	}
-	//// 传到远程服务器进行检测
-	//respBody := photo.PostImage(images)
-	//// 根据左右摄像头，处理检测结果
-	//goodsList, receiveJson := receiveJsonHandle(respBody, m.Value["sequence"][0])
-	//// TODO: 更新购物车
-	//if Result.LeftResult1 != nil && Result.RightResult1 != nil && Result.LeftResult2 != nil && Result.RightResult2 != nil {
-	//	goodsAll := addResults([]map[string] int{Result.LeftResult1, Result.RightResult1, Result.LeftResult2, Result.RightResult2})
-	//	change := counter.UpdateCounter(m.Value["machineid"][0], m.Value["state"][0], goodsAll)
-	//	Result.LeftResult1, Result.RightResult1, Result.LeftResult2, Result.RightResult2 = nil, nil, nil, nil        // 更新存储的结果
-	//	fmt.Println(m.Value["state"][0])
-	//	c.JSON(http.StatusOK, gin.H{
-	//		"status":  "success",
-	//		"get photo number": 2,
-	//		"goodList": goodsAll,
-	//		"changed": change,
-	//	})
-	//} else {
-	//	fmt.Println(m.Value["state"][0])
-	//	c.JSON(http.StatusOK, gin.H{
-	//		"status":  "success",
-	//		"get photo number": 1,
-	//		"goodList": goodsList,
-	//	})
-	//}
-	//drawRectangle(fileHeaders[0].Filename, receiveJson, m.Value["sequence"][0])
+	// 传到远程服务器进行检测
+	respBody := photo.PostImage(images)
+	// 根据左右摄像头，处理检测结果
+	goodsList, receiveJson := receiveJsonHandle(respBody, m.Value["sequence"][0])
+	// TODO: 更新购物车
+	if Result.LeftResult1 != nil && Result.RightResult1 != nil && Result.LeftResult2 != nil && Result.RightResult2 != nil {
+		goodsAll := addResults([]map[string] int{Result.LeftResult1, Result.RightResult1, Result.LeftResult2, Result.RightResult2})
+		change := counter.UpdateCounter(m.Value["machineid"][0], m.Value["state"][0], goodsAll)
+		Result.LeftResult1, Result.RightResult1, Result.LeftResult2, Result.RightResult2 = nil, nil, nil, nil        // 更新存储的结果
+		fmt.Println(m.Value["state"][0])
+		c.JSON(http.StatusOK, gin.H{
+			"status":  "success",
+			"get photo number": 2,
+			"goodList": goodsAll,
+			"changed": change,
+		})
+	} else {
+		fmt.Println(m.Value["state"][0])
+		c.JSON(http.StatusOK, gin.H{
+			"status":  "success",
+			"get photo number": 1,
+			"goodList": goodsList,
+		})
+	}
+	drawRectangle(fileHeaders[0].Filename, receiveJson, m.Value["sequence"][0])
 	c.JSON(http.StatusOK, gin.H{
 		"status":           "success",
 		"get photo number": 2,

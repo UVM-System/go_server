@@ -1,4 +1,4 @@
-// 存储和照片有关的信息
+// Package photo 存储和照片有关的信息
 package photo
 
 type ImageBytes struct {
@@ -21,7 +21,7 @@ type ImageBytes struct {
 //	return formData
 //}
 
-// 构造一张图像的结构，用于数据流传输
+// CreateImageBytes 构造一张图像的结构，用于数据流传输
 func CreateImageBytes(data []byte, filename string) ImageBytes {
 	img := ImageBytes {
 		FieldName: "image",
