@@ -3,13 +3,12 @@ package handler
 
 import (
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"go_server/counter"
 	"go_server/photo"
+	"gocv.io/x/gocv"
 	"log"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
-	"gocv.io/x/gocv"
 )
 
 // 处理来自树莓派的照片数据
@@ -40,7 +39,7 @@ func ImageHandler(c *gin.Context) {
 		images = append(images, photo.CreateImageBytes(data, fileHeader.Filename))
 		// 写入图像中
 		pic, _ := gocv.IMDecode(data, gocv.IMReadColor)
-		gocv.IMWrite("./pictures/original/"+fileHeader.Filename, pic)
+		gocv.IMWrite(originalFilepath+fileHeader.Filename, pic)
 	}
 	// 传到远程服务器进行检测
 	respBody := photo.PostImage(images)

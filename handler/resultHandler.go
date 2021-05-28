@@ -8,6 +8,8 @@ import (
 	"image"
 	"image/color"
 	"log"
+	"os"
+	"strings"
 )
 
 type DetectResultJson struct {
@@ -34,11 +36,15 @@ type ImagesResult struct {
 }
 
 const(
-	LeftBound int = 1200
-	RightBound int = 660
+	LeftBound int = 1320
+	RightBound int = 415
 )
 
-var Result ImagesResult  // 存储左右两张图片的检测结果
+var (
+	Result ImagesResult  // 存储左右两张图片的检测结果
+	originalFilepath = "./pictures/original/"
+	detectedFilepath = "./pictures/detected/"
+)
 
 func init() {
 	Result = ImagesResult{
@@ -46,6 +52,14 @@ func init() {
 		RightResult1: nil,
 		LeftResult2:  nil,
 		RightResult2: nil,
+	}
+	err := os.MkdirAll(originalFilepath, os.ModePerm)
+	if err != nil {
+		log.Println(originalFilepath, " mkdir failed!!!")
+	}
+	err = os.MkdirAll(detectedFilepath, os.ModePerm)
+	if err != nil {
+		log.Println(detectedFilepath, " mkdir failed!!!")
 	}
 }
 
@@ -67,22 +81,14 @@ func receiveJsonHandle(data []byte, sequence string) (map[string]int, ReceiveJso
 		//	continue
 		//}
 		// 检查坐标
-		if sequence == "[1]left" && (detectResultJson.X1 + detectResultJson.X2) / 2 > LeftBound {
-			continue
-		}
-		if sequence == "[1]right" && (detectResultJson.X1 + detectResultJson.X2) / 2 < RightBound {
-			continue
-		}
-		if sequence == "[2]left" && (detectResultJson.X1 + detectResultJson.X2) / 2 > LeftBound {
-			continue
-		}
-		if sequence == "[2]right" && (detectResultJson.X1 + detectResultJson.X2) / 2 < RightBound {
-			continue
-		}
-		if _, ok := goodsList[goodsNmae]; ok {  // 检测是否已经加入货架中
-			goodsList[goodsNmae]++
-		} else {  // 如果不存在，初始化为 1
-			goodsList[goodsNmae] = 1
+		position := (detectResultJson.X1 + detectResultJson.X2) / 2
+		if strings.Contains(sequence, "left") && position < LeftBound ||
+			strings.Contains(sequence, "right") && position > RightBound {
+			if _, ok := goodsList[goodsNmae]; ok {  // 检测是否已经加入货架中
+				goodsList[goodsNmae]++
+			} else {  // 如果不存在，初始化为 1
+				goodsList[goodsNmae] = 1
+			}
 		}
 	}
 	if sequence == "[1]left" {
@@ -118,23 +124,20 @@ func addResults(results []map[string]int) []counter.Goods {
 
 // 测试在图像上画检测出来的框
 func drawRectangle(fileName string, receiveJson ReceiveJson, sequence string) {
-	img := gocv.IMRead(fileName, gocv.IMReadColor)
+	img := gocv.IMRead(originalFilepath + fileName, gocv.IMReadColor)
+	if img.Empty() {
+		log.Println("read image file failed, please check the file path")
+		log.Println("filepath is: ", originalFilepath + fileName)
+	}
 	for _, result := range receiveJson.DetectResult{
 		// 检查坐标
-		if sequence == "[1]left" && (result.X1 + result.X2) / 2 > LeftBound {
-			continue
-		} else if sequence == "[1]right" && (result.X1 + result.X2) / 2 < RightBound {
-			continue
+		position := (result.X1 + result.X2) / 2
+		if strings.Contains(sequence, "left") && position < LeftBound ||
+			strings.Contains(sequence, "right") && position > RightBound {
+			r := image.Rect(result.X1, result.Y1, result.X2, result.Y2)
+			c := color.RGBA{0, 255, 33, 255}
+			gocv.Rectangle(&img, r, c, 2)
 		}
-		// TODO: 第二层摄像头
-		if sequence == "[2]left" && (result.X1 + result.X2) / 2 > LeftBound {
-			continue
-		} else if sequence == "[2]right" && (result.X1 + result.X2) / 2 < RightBound {
-			continue
-		}
-		r := image.Rect(result.X1, result.Y1, result.X2, result.Y2)
-		c := color.RGBA{0, 255, 33, 255}
-		gocv.Rectangle(&img, r, c, 2)
 	}
-	gocv.IMWrite(fileName, img)
+	gocv.IMWrite(detectedFilepath + fileName, img)
 }
