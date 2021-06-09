@@ -33,8 +33,9 @@ func main() {
 	router := gin.Default()
 	// 调用 POST 方法，传入路由参数和路由函数
 	router.POST("/photo", handler.ImageHandler)
+	// 监听 Get 请求，
+	router.GET("/result", handler.ResultHandler)
 	// 监听端口 8000
 	router.Run(":8000")
-
 	wg.Wait()
 }

@@ -13,7 +13,10 @@ type Goods struct {
 	Number int
 }
 
-var Counters map[string][]Goods
+var (
+	Counters map[string][]Goods
+	Change map[string]int
+)
 
 func init() {
 	Counters = make(map[string][]Goods)
@@ -28,8 +31,8 @@ func UpdateCounter(machineid string, state string, goodsList []Goods) map[string
 	} else if strings.EqualFold(state,"end") {  // 拿出结算
 		goodsListPre := Counters[machineid]
 		change := calChangedNumber(goodsListPre, goodsList)
-		//// 更新 Counters
-		//Counters[machineid] = goodsList
+		// 更新 Change
+		Change = change
 		return change
 	}
 	log.Println("receive illegal message")

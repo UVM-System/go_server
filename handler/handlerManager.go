@@ -11,7 +11,7 @@ import (
 	"net/http"
 )
 
-// 处理来自树莓派的照片数据
+// ImageHandler 处理来自树莓派的照片数据
 func ImageHandler(c *gin.Context) {
 	fmt.Println("============= A POST request comes =============")
 	m, err := c.MultipartForm()
@@ -40,6 +40,8 @@ func ImageHandler(c *gin.Context) {
 		// 写入图像中
 		pic, _ := gocv.IMDecode(data, gocv.IMReadColor)
 		gocv.IMWrite(originalFilepath+fileHeader.Filename, pic)
+		log.Println(fileHeader.Filename)
+		log.Println(m.Value["sequence"][0])
 	}
 	// 传到远程服务器进行检测
 	respBody := photo.PostImage(images)
@@ -53,7 +55,7 @@ func ImageHandler(c *gin.Context) {
 		fmt.Println(m.Value["state"][0])
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "success",
-			"get photo number": 2,
+			"get photo number": 4,
 			"goodList": goodsAll,
 			"changed": change,
 		})
@@ -66,8 +68,11 @@ func ImageHandler(c *gin.Context) {
 		})
 	}
 	drawRectangle(fileHeaders[0].Filename, receiveJson, m.Value["sequence"][0])
+}
+
+// ResultHandler 处理来自客户端的请求
+func ResultHandler(c *gin.Context)  {
 	c.JSON(http.StatusOK, gin.H{
-		"status":           "success",
-		"get photo number": 2,
+		"change": counter.Change,
 	})
 }
