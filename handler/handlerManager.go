@@ -2,14 +2,42 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go_server/counter"
 	"go_server/photo"
 	"gocv.io/x/gocv"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"time"
 )
+
+type ProductInfo struct {
+	Img  string `json:"img"`
+	Name     string `json:"name"`
+	Price float64 `json:"price"`
+	Number int `json:"number"`
+}
+
+type Image struct {
+	ID uint `json:"id"`
+	URL string `json:"url"`
+}
+
+type Product struct {
+	Id          uint      `json:"id"`
+	BusinessId  uint      `json:"business_id"`
+	Name        string    `json:"name"`
+	EnglishName string    `json:"english_name"`
+	Info        string    `json:"info"`
+	Number      int       `json:"number"`
+	UpdateTime  time.Time `json:"update_time"`
+	Price       float64   `json:"price"`
+	Image       Image     `json:"image"`
+	ImageID     uint      `json:"image_id"`
+}
 
 // ImageHandler 处理来自树莓派的照片数据
 func ImageHandler(c *gin.Context) {
@@ -72,7 +100,25 @@ func ImageHandler(c *gin.Context) {
 
 // ResultHandler 处理来自客户端的请求
 func ResultHandler(c *gin.Context)  {
+	var change []ProductInfo
+	for k, v := range counter.Change {
+		resp, err := http.Get("http://10.249.47.213/product/getInfoByEN?EnglishName=" + k)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		body, _ := ioutil.ReadAll(resp.Body)
+		var productInfo ProductInfo
+		_ = json.Unmarshal(body,&productInfo)
+		change = append(change, ProductInfo{
+			Img: "/images/goods/" + k + ".jpg",
+			Name: productInfo.Name,
+			Price: productInfo.Price,
+			Number: v,
+		})
+		fmt.Println(k, v)
+	}
 	c.JSON(http.StatusOK, gin.H{
-		"change": counter.Change,
+		"change": change,
 	})
 }
