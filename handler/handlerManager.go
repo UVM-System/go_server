@@ -91,8 +91,8 @@ func ResultHandler(c *gin.Context)  {
 		body, _ := ioutil.ReadAll(resp.Body)
 		change = append(change, ProductInfo{
 			Img: "/images/goods/" + k + ".jpg",
-			Name: gojsonq.New().FromString(string(body)).Find("product.name").(string),
-			Price: gojsonq.New().FromString(string(body)).Find("product.price").(float64),
+			Name: gojsonq.New().FromString(string(body)).Find("data.product.name").(string),
+			Price: gojsonq.New().FromString(string(body)).Find("data.product.price").(float64),
 			Number: v,
 		})
 		fmt.Println(k, v)
