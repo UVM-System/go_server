@@ -2,16 +2,15 @@
 package handler
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/thedevsaddam/gojsonq/v2"
 	"go_server/counter"
 	"go_server/photo"
 	"gocv.io/x/gocv"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 )
 
 type ProductInfo struct {
@@ -19,24 +18,6 @@ type ProductInfo struct {
 	Name     string `json:"name"`
 	Price float64 `json:"price"`
 	Number int `json:"number"`
-}
-
-type Image struct {
-	ID uint `json:"id"`
-	URL string `json:"url"`
-}
-
-type Product struct {
-	Id          uint      `json:"id"`
-	BusinessId  uint      `json:"business_id"`
-	Name        string    `json:"name"`
-	EnglishName string    `json:"english_name"`
-	Info        string    `json:"info"`
-	Number      int       `json:"number"`
-	UpdateTime  time.Time `json:"update_time"`
-	Price       float64   `json:"price"`
-	Image       Image     `json:"image"`
-	ImageID     uint      `json:"image_id"`
 }
 
 // ImageHandler 处理来自树莓派的照片数据
@@ -108,12 +89,10 @@ func ResultHandler(c *gin.Context)  {
 			return
 		}
 		body, _ := ioutil.ReadAll(resp.Body)
-		var productInfo ProductInfo
-		_ = json.Unmarshal(body,&productInfo)
 		change = append(change, ProductInfo{
 			Img: "/images/goods/" + k + ".jpg",
-			Name: productInfo.Name,
-			Price: productInfo.Price,
+			Name: gojsonq.New().FromString(string(body)).Find("product.name").(string),
+			Price: gojsonq.New().FromString(string(body)).Find("product.price").(float64),
 			Number: v,
 		})
 		fmt.Println(k, v)
