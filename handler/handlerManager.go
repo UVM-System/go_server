@@ -102,7 +102,7 @@ func ImageHandler(c *gin.Context) {
 func ResultHandler(c *gin.Context)  {
 	var change []ProductInfo
 	for k, v := range counter.Change {
-		resp, err := http.Get("http://10.249.47.213/product/getInfoByEN?EnglishName=" + k)
+		resp, err := http.Get("http://10.249.47.213:8000/product/getInfoByEN?EnglishName=" + k)
 		if err != nil {
 			log.Println(err)
 			return
