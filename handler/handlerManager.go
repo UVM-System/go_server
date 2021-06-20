@@ -95,7 +95,6 @@ func ResultHandler(c *gin.Context)  {
 			Price: gojsonq.New().FromString(string(body)).Find("data.product.price").(float64),
 			Number: v,
 		})
-		fmt.Println(k, v)
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"change": change,
