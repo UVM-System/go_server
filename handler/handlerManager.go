@@ -14,7 +14,8 @@ import (
 )
 
 type ProductInfo struct {
-	Img  string `json:"img"`
+	productId int `json:"productId"`
+	ImageUrl  string `json:"imageUrl"`
 	Name     string `json:"name"`
 	Price float64 `json:"price"`
 	Number int `json:"number"`
@@ -90,7 +91,8 @@ func ResultHandler(c *gin.Context)  {
 		}
 		body, _ := ioutil.ReadAll(resp.Body)
 		change = append(change, ProductInfo{
-			Img: "/images/goods/" + k + ".jpg",
+			productId: gojsonq.New().FromString(string(body)).Find("data.product.id").(int),
+			ImageUrl: gojsonq.New().FromString(string(body)).Find("data.product.image_url").(string),
 			Name: gojsonq.New().FromString(string(body)).Find("data.product.name").(string),
 			Price: gojsonq.New().FromString(string(body)).Find("data.product.price").(float64),
 			Number: v,
