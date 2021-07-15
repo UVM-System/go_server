@@ -84,11 +84,12 @@ func ImageHandler(c *gin.Context) {
 func ResultHandler(c *gin.Context)  {
 	var change []ProductInfo
 	for k, v := range counter.Change {
-		resp, err := http.Get("http://10.249.47.213:8000/product/getInfoByEN?EnglishName=" + k)
+		resp, err := http.Get("http://10.249.47.213:8000/business/product/getInfoByEN?EnglishName=" + k)
 		if err != nil {
 			log.Println(err)
 			return
 		}
+		log.Println(resp.Body)
 		body, _ := ioutil.ReadAll(resp.Body)
 		change = append(change, ProductInfo{
 			productId: gojsonq.New().FromString(string(body)).Find("data.product.id").(int),
