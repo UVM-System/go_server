@@ -89,13 +89,21 @@ func ResultHandler(c *gin.Context)  {
 			log.Println(err)
 			return
 		}
-		log.Println(resp.Body)
 		body, _ := ioutil.ReadAll(resp.Body)
+		log.Println(string(body))
+		jsonq := gojsonq.New().FromString(string(body))
+		p := int(jsonq.Find("data.product.id").(float64))
+		jsonq.Reset()
+		i := jsonq.Find("data.product.image_url").(string)
+		jsonq.Reset()
+		n := jsonq.Find("data.product.name").(string)
+		jsonq.Reset()
+		c := jsonq.Find("data.product.price").(float64)
 		change = append(change, ProductInfo{
-			productId: gojsonq.New().FromString(string(body)).Find("data.product.id").(int),
-			ImageUrl: gojsonq.New().FromString(string(body)).Find("data.product.image_url").(string),
-			Name: gojsonq.New().FromString(string(body)).Find("data.product.name").(string),
-			Price: gojsonq.New().FromString(string(body)).Find("data.product.price").(float64),
+			productId: p,
+			ImageUrl: i,
+			Name: n,
+			Price: c,
 			Number: v,
 		})
 	}
