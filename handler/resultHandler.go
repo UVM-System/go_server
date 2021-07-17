@@ -31,8 +31,8 @@ type ReceiveJson struct {
 type ImagesResult struct {
 	LeftResult1 map[string]int
 	RightResult1 map[string]int
-	LeftResult2 map[string]int
-	RightResult2 map[string]int
+	//LeftResult2 map[string]int
+	//RightResult2 map[string]int
 }
 
 const(
@@ -50,8 +50,8 @@ func init() {
 	Result = ImagesResult{
 		LeftResult1:  nil,
 		RightResult1: nil,
-		LeftResult2:  nil,
-		RightResult2: nil,
+		//LeftResult2:  nil,
+		//RightResult2: nil,
 	}
 	err := os.MkdirAll(originalFilepath, os.ModePerm)
 	if err != nil {
@@ -95,10 +95,10 @@ func receiveJsonHandle(data []byte, sequence string) (map[string]int, ReceiveJso
 		Result.LeftResult1 = goodsList
 	} else if sequence == "[1]right" {
 		Result.RightResult1 = goodsList
-	} else if sequence == "[2]left" {
-		Result.LeftResult2 = goodsList
-	} else if sequence == "[2]right" {
-		Result.RightResult2 = goodsList
+	//} else if sequence == "[2]left" {
+	//	Result.LeftResult2 = goodsList
+	//} else if sequence == "[2]right" {
+	//	Result.RightResult2 = goodsList
 	}
 	return goodsList, receiveJson
 }

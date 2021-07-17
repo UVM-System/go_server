@@ -24,7 +24,7 @@ type ProductInfo struct {
 // ImageHandler 处理来自树莓派的照片数据
 func ImageHandler(c *gin.Context) {
 	fmt.Println("============= A POST request comes =============")
-	m, err := c.MultipartForm()
+	m , err := c.MultipartForm()
 	if err != nil {
 		fmt.Println("Sorry this POST request is not MultipartForm")
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -58,10 +58,10 @@ func ImageHandler(c *gin.Context) {
 	// 根据左右摄像头，处理检测结果
 	goodsList, receiveJson := receiveJsonHandle(respBody, m.Value["sequence"][0])
 	// TODO: 更新购物车
-	if Result.LeftResult1 != nil && Result.RightResult1 != nil && Result.LeftResult2 != nil && Result.RightResult2 != nil {
-		goodsAll := addResults([]map[string] int{Result.LeftResult1, Result.RightResult1, Result.LeftResult2, Result.RightResult2})
+	if Result.LeftResult1 != nil && Result.RightResult1 != nil {
+		goodsAll := addResults([]map[string] int{Result.LeftResult1, Result.RightResult1})
 		change := counter.UpdateCounter(m.Value["machineid"][0], m.Value["state"][0], goodsAll)
-		Result.LeftResult1, Result.RightResult1, Result.LeftResult2, Result.RightResult2 = nil, nil, nil, nil        // 更新存储的结果
+		Result.LeftResult1, Result.RightResult1 = nil, nil        // 更新存储的结果
 		fmt.Println(m.Value["state"][0])
 		c.JSON(http.StatusOK, gin.H{
 			"status":  "success",
